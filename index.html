@@ -183,15 +183,17 @@
           return;
         }
 
-        const budget = days * 600;
+        const budget = days * 400;
         if (cost > budget) {
           const over = cost - budget;
           const overFormatted = over.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
           resultDiv.className = "too-expensive";
           resultDiv.textContent = `Nah, too expensive! You are ${overFormatted} over budget for a ${days} day holiday.`;
         } else {
+          const spending = days * 200;
+          const spendingFormatted = spending.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
           resultDiv.className = "within-budget";
-          resultDiv.textContent = `Within budget for a ${days} day holiday! Enjoy your holiday.`;
+          resultDiv.textContent = `Within budget for a ${days} day holiday! You also have ${spendingFormatted} for food and attractions.`;
         }
       });
     </script>
