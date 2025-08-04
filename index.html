@@ -188,10 +188,10 @@
           const over = cost - budget;
           const overFormatted = over.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
           resultDiv.className = "too-expensive";
-          resultDiv.textContent = `Nah, too expensive! You are ${overFormatted} over budget for a ${days} days holiday.`;
+          resultDiv.textContent = `Nah, too expensive! You are ${overFormatted} over budget for a ${days} day holiday.`;
         } else {
           resultDiv.className = "within-budget";
-          resultDiv.textContent = `Within budget for a ${days} holiday! Enjoy your holiday.`;
+          resultDiv.textContent = `Within budget for a ${days} day holiday! Enjoy your holiday.`;
         }
       });
     </script>
