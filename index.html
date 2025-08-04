@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Is This Holiday Too Expensive?</title>
+    <style>
+      body {
+        background: #f7f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 2em 2.5em;
+        max-width: 400px;
+        width: 100%;
+        margin: 2em 0;
+      }
+      h1 {
+        text-align: center;
+        color: #2d3748;
+        margin-bottom: 0.5em;
+        font-size: 2em;
+        letter-spacing: 1px;
+      }
+      .input-group {
+        margin-bottom: 1.5em;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.5em;
+        color: #4a5568;
+        font-weight: 500;
+      }
+      .radio-group {
+        display: flex;
+        gap: 1.5em;
+        margin-bottom: 1em;
+      }
+      input[type="number"],
+      input[type="date"] {
+        width: 100%;
+        padding: 0.7em;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 1em;
+        background: #f1f5f9;
+        margin-bottom: 0.5em;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+      }
+      input[type="number"]:focus,
+      input[type="date"]:focus {
+        border-color: #4299e1;
+        outline: none;
+      }
+      button {
+        width: 100%;
+        padding: 0.9em;
+        background: linear-gradient(90deg, #4299e1 0%, #38b2ac 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(66, 153, 225, 0.08);
+        transition: background 0.2s;
+      }
+      button:hover {
+        background: linear-gradient(90deg, #3182ce 0%, #319795 100%);
+      }
+      #result {
+        margin-top: 2em;
+        font-weight: bold;
+        text-align: center;
+        font-size: 1.2em;
+        padding: 1em;
+        border-radius: 8px;
+        background: #edf2f7;
+        color: #2d3748;
+        min-height: 2em;
+      }
+      #result.too-expensive {
+        background: #fed7d7;
+        color: #c53030;
+        border: 1px solid #feb2b2;
+      }
+      #result.within-budget {
+        background: #c6f6d5;
+        color: #276749;
+        border: 1px solid #68d391;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Is this holiday too expensive?</h1>
+      <form id="holidayForm">
+        <div class="input-group">
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="daysMode" value="range" checked/>
+              Date range
+            </label>
+            <label>
+              <input type="radio" name="daysMode" value="number" />
+              Number of days
+            </label>
+          </div>
+          <div style="display: flex; gap: 1em">
+            <input type="date" id="startDate" />
+            <input type="date" id="endDate" />
+          </div>
+          <input type="number" id="numDays" min="1" placeholder="Number of days" />
+        </div>
+        <div class="input-group">
+          <label for="cost">Holiday cost ($):</label>
+          <input type="number" id="cost" min="0" required placeholder="Total cost" />
+        </div>
+        <button type="submit">Check</button>
+      </form>
+      <div id="result"></div>
+    </div>
+    <script>
+      const numDaysInput = document.getElementById("numDays");
+      const startDateInput = document.getElementById("startDate");
+      const endDateInput = document.getElementById("endDate");
+      const daysModeRadios = document.getElementsByName("daysMode");
+      const resultDiv = document.getElementById("result");
+
+      function updateInputs() {
+        if (daysModeRadios[0].checked) {
+          numDaysInput.disabled = true;
+          startDateInput.disabled = false;
+          endDateInput.disabled = false;
+          numDaysInput.style.background = "#f1f5f9";
+          startDateInput.style.background = "";
+          endDateInput.style.background = "";
+        } else {
+          numDaysInput.disabled = false;
+          startDateInput.disabled = true;
+          endDateInput.disabled = true;
+          numDaysInput.style.background = "";
+          startDateInput.style.background = "#f1f5f9";
+          endDateInput.style.background = "#f1f5f9";
+        }
+      }
+
+      daysModeRadios.forEach((radio) => radio.addEventListener("change", updateInputs));
+      updateInputs();
+
+      document.getElementById("holidayForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        let days;
+        resultDiv.className = "";
+        if (daysModeRadios[0].checked) {
+          days = parseInt(numDaysInput.value, 10);
+          if (isNaN(days) || days < 1) {
+            resultDiv.textContent = "Please enter a valid number of days.";
+            return;
+          }
+        } else {
+          const start = new Date(startDateInput.value);
+          const end = new Date(endDateInput.value);
+          if (!startDateInput.value || !endDateInput.value || end < start) {
+            resultDiv.textContent = "Please select a valid date range.";
+            return;
+          }
+          days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        const cost = parseFloat(document.getElementById("cost").value);
+        if (isNaN(cost) || cost < 0) {
+          resultDiv.textContent = "Please enter a valid cost.";
+          return;
+        }
+
+        const budget = days * 600;
+        if (cost > budget) {
+          const over = cost - budget;
+          const overFormatted = over.toLocaleString('en-AU', { style: 'currency', currency: 'AUD' });
+          resultDiv.className = "too-expensive";
+          resultDiv.textContent = `Nah, too expensive! You are ${overFormatted} over budget for a ${days} days holiday.`;
+        } else {
+          resultDiv.className = "within-budget";
+          resultDiv.textContent = `Within budget for a ${days} holiday! Enjoy your holiday.`;
+        }
+      });
+    </script>
+  </body>
+</html>
